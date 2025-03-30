@@ -124,6 +124,14 @@ SESSION_SECRET="your-generated-session-secret"
 APP_PASSWORD="your-admin-password"
 ```
 
+# Also, change the allowed hosts in the vite.config.ts file to include your domain:
+
+```ts
+server: {
+  allowedHosts: ["your-domain.com"],
+},
+```
+
 ## Microsoft Azure App Registration
 
 To enable Microsoft authentication:

@@ -21,4 +21,8 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  // CHANGE THIS
+  server: {
+    allowedHosts: ["od.mrerenk.tech"],
+  },
 });
