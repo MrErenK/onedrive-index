@@ -24,5 +24,6 @@ export default defineConfig({
   // CHANGE THIS
   server: {
     allowedHosts: ["od.mrerenk.tech"],
+    port: 3391,
   },
 });

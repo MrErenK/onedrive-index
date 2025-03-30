@@ -77,7 +77,7 @@ This script will:
 npm run dev
 ```
 
-Your application will run at http://localhost:3000
+Your application will run at http://localhost:3391
 
 ## Database Setup
 

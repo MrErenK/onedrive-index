@@ -6,10 +6,10 @@
   "scripts": {
     "build": "remix vite:build",
     "dev": "npm run dev:all",
-    "dev:remix": "remix vite:dev --port 3000",
+    "dev:remix": "remix vite:dev",
     "dev:all": "concurrently \"npm run dev:remix\" \"npm run refresh-tokens\"",
     "start": "npm run start:all",
-    "start:remix": "remix-serve ./build/server/index.js",
+    "start:remix": "PORT=3391 remix-serve ./build/server/index.js",
     "start:all": "concurrently \"npm run start:remix\" \"npm run refresh-tokens\"",
     "typecheck": "tsc",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
