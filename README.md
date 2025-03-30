@@ -44,8 +44,8 @@ Before proceeding, make sure you have:
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/yourusername/onedrive-explorer.git
-cd onedrive-explorer
+git clone https://github.com/yourusername/onedrive-index.git
+cd onedrive-index
 ```
 
 2. **Install dependencies:**
