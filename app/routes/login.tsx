@@ -136,8 +136,11 @@ export default function Login() {
 
   // If setup was successful, show login form
   useEffect(() => {
-    if (actionData?.success) {
-      setIsSetup(false);
+    if (actionData) {
+      setIsSubmitting(false); // Reset submission state whenever we get a response
+      if (actionData.success) {
+        setIsSetup(false);
+      }
     }
   }, [actionData]);
 
