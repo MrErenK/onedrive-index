@@ -4,8 +4,13 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import crypto from "crypto";
 import process from "process";
+import dotenv from "dotenv";
 
 const __filename = fileURLToPath(import.meta.url);
+const rootDir = dirname(dirname(__filename));
+
+// Load .env file from parent directory
+dotenv.config({ path: join(rootDir, ".env") });
 
 // Configuration
 const CONFIG = {
