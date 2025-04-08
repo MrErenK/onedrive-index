@@ -53,7 +53,9 @@
     "downloadFileButton": "Download File",
     "modified": "Modified",
     "type": "Type",
-    "size": "Size"
+    "size": "Size",
+    "fileInfo": "File Information",
+    "created": "Created"
   },
   "auth": {
     "password": "Password",

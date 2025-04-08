@@ -53,7 +53,9 @@
     "downloadFileButton": "Dosyayı İndir",
     "modified": "Düzenlenme",
     "type": "Tür",
-    "size": "Boyut"
+    "size": "Boyut",
+    "fileInfo": "Dosya Bilgisi",
+    "created": "Oluşturulma"
   },
   "auth": {
     "password": "Şifre",

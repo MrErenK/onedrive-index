@@ -89,31 +89,39 @@ export function SearchDialog({ isOpen, onClose, onSearch }: SearchDialogProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-[15vh] z-50 mx-auto max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-gray-800"
+            className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+            className="fixed inset-x-0 top-[15vh] z-50 mx-auto max-w-2xl overflow-hidden rounded-2xl bg-white/90 backdrop-blur-md shadow-xl ring-1 ring-black/5 dark:bg-gray-800/90 dark:ring-white/10"
           >
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-gray-200/80 dark:border-gray-700/80">
               <div className="flex items-center px-4">
-                <Icons.Search className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
+                <Icons.Search className="h-5 w-5 text-gray-500/90 dark:text-gray-400/90" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t("header.searchPlaceholder")}
-                  className="flex-1 bg-transparent px-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:ring-offset-0 dark:text-white dark:placeholder-gray-400"
+                  className="flex-1 bg-transparent px-4 py-4 text-gray-900 placeholder-gray-500/90 focus:outline-none focus:ring-0 dark:text-white dark:placeholder-gray-400/80"
+                  autoFocus
                 />
-                <kbd className="hidden ml-2 rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400 sm:inline-block">
+                <kbd className="hidden sm:flex items-center justify-center rounded-lg bg-gray-100/80 px-2 py-1 text-xs text-gray-500 dark:bg-gray-700/80 dark:text-gray-400 min-w-[28px]">
                   ESC
                 </kbd>
               </div>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto p-2">
+            <div className="max-h-[60vh] overflow-y-auto overflow-x-hidden p-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
               {isSearching ? (
                 <div className="flex items-center justify-center py-8">
                   <LoadingSpinner size="small" />
@@ -136,7 +144,7 @@ export function SearchDialog({ isOpen, onClose, onSearch }: SearchDialogProps) {
                           : `/files/view/${file.id}`
                       }
                       onClick={onClose}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-700/50"
                     >
                       {file.folder ? (
                         <Icons.Folder className="h-5 w-5 text-amber-500 dark:text-amber-400" />

@@ -20,11 +20,16 @@ export function LoadingSpinner({
   };
 
   const colorClassMap = {
-    primary: "border-blue-600 border-t-transparent",
-    secondary: "border-purple-600 border-t-transparent",
-    success: "border-green-500 border-t-transparent",
-    error: "border-red-500 border-t-transparent",
-    light: "border-gray-200 border-t-transparent dark:border-gray-700",
+    primary:
+      "border-blue-600 border-t-blue-200/30 dark:border-blue-500 dark:border-t-blue-200/10",
+    secondary:
+      "border-purple-600 border-t-purple-200/30 dark:border-purple-500 dark:border-t-purple-200/10",
+    success:
+      "border-green-500 border-t-green-200/30 dark:border-green-400 dark:border-t-green-200/10",
+    error:
+      "border-red-500 border-t-red-200/30 dark:border-red-400 dark:border-t-red-200/10",
+    light:
+      "border-gray-300 border-t-gray-100/30 dark:border-gray-600 dark:border-t-gray-400/10",
   };
 
   const thicknessClassMap = {

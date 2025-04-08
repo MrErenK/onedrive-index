@@ -27,7 +27,7 @@ export function FileGridView({
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md transition-all">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {files.map((file, index) => (
         <motion.div
           key={file.id}
@@ -51,18 +51,18 @@ export function FileGridView({
                     `${getPathFromUrl()}/${file.name}`
                   )}`
             }
-            className="group flex h-full flex-col rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all duration-200 hover:border-blue-400/40 hover:bg-blue-50/40 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/90 dark:hover:border-blue-500/40 dark:hover:bg-blue-900/20"
+            className="group flex h-full flex-col rounded-xl border border-gray-200/70 bg-white/60 backdrop-blur-sm p-3 shadow-sm transition-all duration-200 hover:border-blue-400/30 hover:bg-blue-50/30 hover:shadow-md dark:border-gray-700/50 dark:bg-gray-800/50 dark:hover:border-blue-500/30 dark:hover:bg-blue-900/20"
             aria-label={
               file.folder ? `Open ${file.name} folder` : `View ${file.name}`
             }
           >
             <div className="flex items-center justify-center my-2 relative">
               {file.folder ? (
-                <div className="flex h-16 items-center justify-center text-amber-500 dark:text-amber-400">
+                <div className="flex h-16 items-center justify-center text-amber-500/90 dark:text-amber-400/90">
                   <Icons.Folder className="h-14 w-14 transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-2deg]" />
                 </div>
               ) : (
-                <div className="flex h-16 items-center justify-center text-blue-400 dark:text-blue-300">
+                <div className="flex h-16 items-center justify-center text-blue-500/90 dark:text-blue-400/90">
                   <Icons.File className="h-14 w-14 transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[2deg]" />
                 </div>
               )}
@@ -70,26 +70,24 @@ export function FileGridView({
 
             <div className="text-center w-full px-1">
               <span
-                className="block font-medium text-sm text-gray-900 dark:text-gray-200 line-clamp-2 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                className="block font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-2 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400"
                 title={file.name}
               >
                 {file.name}
               </span>
 
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                 {file.folder ? (
                   <span className="flex flex-col items-center gap-1">
                     {file.folder.childCount}{" "}
-                    {file.folder.childCount === 1
-                      ? t("common.item")
-                      : t("common.items")}
+                    {file.folder.childCount === 1 ? "item" : "items"}
                   </span>
                 ) : (
                   formatFileSize(file.size)
                 )}
               </p>
 
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                 {new Date(file.lastModifiedDateTime).toLocaleString(undefined, {
                   year: "numeric",
                   month: "short",
@@ -104,7 +102,7 @@ export function FileGridView({
               <div className="mt-auto pt-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <Link
                   to={`/files/download/${file.id}`}
-                  className="w-full inline-flex items-center justify-center rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800/70"
+                  className="w-full inline-flex items-center justify-center rounded-md bg-blue-100/80 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200/80 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-800/60"
                   reloadDocument
                   onClick={(e) => e.stopPropagation()}
                 >

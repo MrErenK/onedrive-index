@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 import { ThemeToggle } from "./theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "./icons";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SearchDialog } from "./search-dialog";
 import type { DriveItem } from "~/utils/onedrive.server";
 import { LanguageSelector } from "./language-selector";
@@ -11,18 +11,25 @@ import { useTranslation } from "react-i18next";
 export function Header({
   user,
   onSearch,
-  viewMode,
-  setViewMode,
   scrolled,
 }: {
   user: any;
   onSearch?: (query: string) => Promise<DriveItem[]>;
-  viewMode?: "list" | "grid";
-  setViewMode?: (mode: "list" | "grid") => void;
   scrolled: boolean;
 }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [stableScrolled, setStableScrolled] = useState(scrolled);
   const { t } = useTranslation();
+
+  // Add debounced scroll handling
+  useEffect(() => {
+    // Add a delay to ensure the scrolled state doesn't flicker
+    const timer = setTimeout(() => {
+      setStableScrolled(scrolled);
+    }, 50); // Small delay to stabilize transitions
+
+    return () => clearTimeout(timer);
+  }, [scrolled]);
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -35,84 +42,52 @@ export function Header({
   return (
     <>
       <header
-        className={`sticky top-0 z-50 border-b border-gray-200 bg-white/85 backdrop-blur-md backdrop-saturate-150 shadow-sm dark:border-gray-800 dark:bg-black/90 transition-all duration-200 ${
-          scrolled ? "py-2" : "py-3"
-        }`}
+        className={`sticky top-0 z-50 border-b backdrop-blur-md backdrop-saturate-150 transition-all duration-300 ease-in-out
+          ${
+            stableScrolled
+              ? "border-gray-200/80 bg-white/90 dark:border-gray-800/80 dark:bg-gray-900/90 shadow-sm py-2"
+              : "border-transparent bg-white/50 dark:bg-gray-900/50 py-3"
+          }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <motion.div
-              className="flex items-center gap-6"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              <h1
-                className={`text-xl font-bold text-gray-900 dark:text-white transition-all duration-200 ${
-                  scrolled ? "text-lg" : "text-xl"
-                }`}
+            <div className="flex items-center gap-6">
+              <Link
+                to="/files"
+                className="group flex items-center gap-2.5 hover:opacity-90 transition-all"
+                aria-label="Navigate to files"
               >
-                <Link
-                  to="/files"
-                  className="flex items-center hover:opacity-80 transition-opacity"
-                  aria-label="Navigate to files"
-                >
+                <div className="relative">
                   <Icons.Cloud
-                    className={`mr-2.5 text-blue-600 dark:text-blue-400 transition-all duration-200 ${
-                      scrolled ? "h-5 w-5" : "h-6 w-6"
-                    }`}
+                    className={`text-blue-600 dark:text-blue-400 transition-all duration-300
+                      ${stableScrolled ? "h-6 w-6" : "h-7 w-7"}`}
                   />
-                  <span className="tracking-tight">
-                    {t("common.siteTitle")}
-                  </span>
-                </Link>
-              </h1>
-            </motion.div>
-
-            <motion.div
-              className="flex items-center gap-3 sm:gap-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              <AnimatePresence>
-                {scrolled && viewMode && setViewMode && (
                   <motion.div
-                    key="header-view-toggle"
-                    initial={{ opacity: 0, width: 0, overflow: "hidden" }}
-                    animate={{ opacity: 1, width: "auto", overflow: "visible" }}
-                    exit={{ opacity: 0, width: 0, overflow: "hidden" }}
-                    transition={{ duration: 0.3 }}
-                    className="hidden sm:flex items-center gap-2"
-                  >
-                    <button
-                      onClick={() => setViewMode("list")}
-                      className={`p-2 rounded-lg transition-colors ${
-                        viewMode === "list"
-                          ? "bg-gray-200 dark:bg-gray-700"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                      }`}
-                    >
-                      <Icons.List className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded-lg transition-colors ${
-                        viewMode === "grid"
-                          ? "bg-gray-200 dark:bg-gray-700"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                      }`}
-                    >
-                      <Icons.Grid className="h-5 w-5" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    className="absolute -inset-2 rounded-full bg-blue-100 dark:bg-blue-900/30 z-[-1] opacity-0 group-hover:opacity-100 transition-opacity"
+                    animate={{ scale: [0.95, 1.05, 0.95] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3,
+                      ease: "easeInOut",
+                    }}
+                  />
+                </div>
+                <h1
+                  className={`font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 tracking-tight transition-all duration-300
+                    ${stableScrolled ? "text-lg" : "text-xl"}`}
+                >
+                  {t("common.siteTitle")}
+                </h1>
+              </Link>
+            </div>
 
+            <div className="flex items-center gap-3 md:gap-4">
               {onSearch && (
-                <button
+                <motion.button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none"
+                  className="flex items-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-2 text-sm text-gray-700 transition-colors dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <Icons.Search className="mr-2 h-4 w-4" />
                   <span className="hidden sm:inline">{t("common.search")}</span>
@@ -121,34 +96,43 @@ export function Header({
                       ? "⌃K"
                       : "Ctrl+K"}
                   </kbd>
-                </button>
+                </motion.button>
               )}
 
-              <div className="hidden items-center md:flex md:border-r md:border-gray-200 md:dark:border-gray-700 md:pr-4">
-                <div className="relative group">
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user.displayName
-                    )}&background=random&color=fff`}
-                    alt={`${user.displayName}'s avatar`}
-                    className={`mr-2.5 rounded-full ring-2 ring-white dark:ring-gray-800 shadow-sm transition-all duration-200 ${
-                      scrolled ? "h-7 w-7" : "h-8 w-8"
-                    }`}
-                  />
-                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
-                </div>
-                <span
-                  className={`font-medium text-gray-700 dark:text-gray-200 transition-all duration-200 ${
-                    scrolled ? "text-sm" : "text-base"
-                  }`}
+              <div className="flex items-center gap-3">
+                <div
+                  className={`relative hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200/70 dark:border-gray-700/70 transition-all duration-300
+                    ${stableScrolled ? "" : "shadow-sm"}`}
                 >
-                  {user.displayName}
-                </span>
-              </div>
+                  <div className="relative">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user.displayName
+                      )}&background=random&color=fff`}
+                      alt={`${user.displayName}'s avatar`}
+                      className={`rounded-full ring-2 ring-white dark:ring-gray-800 transition-all duration-300
+                        ${stableScrolled ? "h-7 w-7" : "h-8 w-8"}`}
+                    />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+                  </div>
+                  <span
+                    className={`font-medium text-gray-800 dark:text-gray-200 transition-all duration-300
+                      ${stableScrolled ? "text-sm" : "text-base"}`}
+                  >
+                    {user.displayName}
+                  </span>
+                </div>
 
-              <ThemeToggle />
-              <LanguageSelector />
-            </motion.div>
+                <div className="hidden md:flex items-center">
+                  <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1" />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <LanguageSelector />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </header>

@@ -41,10 +41,10 @@ export function FileListView({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-900 transition-all">
+    <div className="overflow-hidden rounded-xl border-0 bg-transparent">
       <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+        <table className="min-w-full divide-y divide-gray-200/70 dark:divide-gray-700/50">
+          <thead className="bg-white/60 dark:bg-gray-800/60 sticky top-0 z-10 backdrop-blur-sm">
             <tr>
               <th
                 scope="col"
@@ -72,14 +72,14 @@ export function FileListView({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-200/70 dark:divide-gray-700/50">
             {files.map((file, index) => (
               <motion.tr
                 key={file.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: index * 0.05 }}
-                className="group transition-colors hover:bg-blue-50/50 dark:hover:bg-blue-900/20"
+                className="group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-800/50"
               >
                 <td className="whitespace-nowrap px-6 py-4">
                   <Link
@@ -105,7 +105,7 @@ export function FileListView({
                         </motion.div>
                       )}
                     </div>
-                    <span className="ml-3 font-medium text-gray-900 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                    <span className="ml-3 font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                       {file.name}
                     </span>
                   </Link>
@@ -142,6 +142,7 @@ export function FileListView({
                       <motion.div
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
+                        className="flex"
                       >
                         <motion.button
                           onClick={(e) => {

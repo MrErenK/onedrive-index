@@ -111,10 +111,10 @@
 /* Custom animations */
 @keyframes shimmer {
   0% {
-    background-position: -1000px 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: 1000px 0;
+    background-position: -200% 0;
   }
 }
 
@@ -145,13 +145,13 @@
     transform: translateX(-100%);
   }
   50% {
-    transform: translateX(30%);
+    transform: translateX(100%);
   }
   100% {
-    transform: translateX(100%);
+    transform: translateX(300%);
   }
 }
 
 .animate-loading-progress {
-  animation: loading-progress 1.5s ease-in-out infinite;
+  animation: loading-progress 2s ease-in-out infinite;
 }

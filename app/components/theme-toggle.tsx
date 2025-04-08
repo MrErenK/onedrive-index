@@ -11,7 +11,6 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // Function to get the effective theme (actual light/dark value)
   const getEffectiveTheme = () => {
     if (theme === "system") {
       return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -26,29 +25,29 @@ export function ThemeToggle() {
     setTheme(currentEffectiveTheme === "dark" ? "light" : "dark");
   };
 
-  // Prevent hydration mismatch by rendering nothing until mounted
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   const effectiveTheme = getEffectiveTheme();
 
   return (
     <motion.button
       onClick={toggleTheme}
-      className="flex items-center justify-center rounded-full p-2.5 text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 transition-colors duration-200 shadow-sm border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 sm:p-3"
-      whileTap={{ scale: 0.92 }}
+      className="relative overflow-hidden rounded-xl bg-white/60 p-2.5 text-gray-700 shadow-sm backdrop-blur-sm transition-all hover:bg-gray-50/80 hover:text-blue-600 hover:shadow-md dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-blue-400 sm:p-3 border border-gray-200/60 dark:border-gray-700/60"
+      whileTap={{ scale: 0.94 }}
       whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       aria-label={`Switch to ${
         effectiveTheme === "dark" ? "light" : "dark"
       } theme`}
     >
-      {effectiveTheme === "dark" ? (
-        <Icons.Sun className="h-5 w-5 sm:h-6 sm:w-6" />
-      ) : (
-        <Icons.Moon className="h-5 w-5 sm:h-6 sm:w-6" />
-      )}
+      <div className="relative z-10">
+        {effectiveTheme === "dark" ? (
+          <Icons.Sun className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-200 hover:rotate-45" />
+        ) : (
+          <Icons.Moon className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-200 hover:-rotate-12" />
+        )}
+      </div>
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-transparent via-gray-100/50 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 dark:via-gray-600/30" />
       <span className="sr-only">
         Switch to {effectiveTheme === "dark" ? "light" : "dark"} mode
       </span>
