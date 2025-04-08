@@ -12,3 +12,12 @@ export function formatFileSize(bytes?: number): string {
 
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
+
+export function formatFilePath(path?: string) {
+  if (!path) return "";
+  return path
+    .replace("/drive/root:", "")
+    .split("/")
+    .filter(Boolean)
+    .join(" / ");
+}

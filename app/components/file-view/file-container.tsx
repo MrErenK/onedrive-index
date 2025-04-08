@@ -1,12 +1,12 @@
 import { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { requireAuth } from "~/utils/auth.server";
+import { motion } from "framer-motion";
+import { FilePreviewWrapper } from "~/components/file-previews/file-preview-wrapper";
 import { createOneDriveService } from "~/services/onedrive.service";
-import { LoadingSpinner } from "~/components/loading-spinner";
 import { FileHeader } from "~/components/file-view/file-header";
 import { FileBadges } from "~/components/file-view/file-badges";
-import { FilePreviewWrapper } from "~/components/file-previews/file-preview-wrapper";
-import { motion } from "framer-motion";
+import { LoadingSpinner } from "../loading-spinner";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const fileName = data?.fileDetails?.name || "File";
