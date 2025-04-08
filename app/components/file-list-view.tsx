@@ -166,7 +166,9 @@ export function FileListView({
                           )}
                         </motion.button>
                         <Link
-                          to={`/files/download/${file.id}`}
+                          to={`/files/download/${encodeURIComponent(
+                            `${getPathFromUrl()}/${file.name}`
+                          )}`}
                           className="inline-flex items-center rounded-full p-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-colors"
                           reloadDocument
                           aria-label={t("common.downloadFile")}
@@ -183,7 +185,9 @@ export function FileListView({
                         whileTap={{ scale: 0.95 }}
                       >
                         <Link
-                          to={`/files?folder=${file.id}`}
+                          to={`/files?folder=${encodeURIComponent(
+                            `${getPathFromUrl()}/${file.name}`
+                          )}`}
                           className="inline-flex items-center rounded-full p-2 text-gray-700 hover:bg-amber-100 hover:text-amber-600 dark:text-gray-300 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors"
                           aria-label={t("common.openFolder")}
                           title={t("common.openFolder")}
