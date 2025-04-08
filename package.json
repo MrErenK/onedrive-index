@@ -15,15 +15,15 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "postinstall": "prisma generate",
     "refresh-tokens": "node scripts/refresh-tokens.js",
-    "generate-secrets": "node scripts/generate-secrets.js"
+    "generate-secrets": "node scripts/generate-secrets.js",
+    "format": "npx prettier --write \"**/*.{tsx,ts,jsx,js,json}\""
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
-    "@remix-run/node": "^2.16.3",
-    "@remix-run/react": "^2.16.3",
-    "@remix-run/serve": "^2.16.3",
-    "@upstash/redis": "^1.34.6",
-    "framer-motion": "^12.6.2",
+    "@remix-run/node": "^2.16.4",
+    "@remix-run/react": "^2.16.4",
+    "@remix-run/serve": "^2.16.4",
+    "framer-motion": "^12.6.3",
     "highlight.js": "^11.11.1",
     "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^8.0.4",
@@ -38,12 +38,11 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.16.3",
+    "@remix-run/dev": "^2.16.4",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "autoprefixer": "^10.4.19",
@@ -52,13 +51,13 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.38",
     "prisma": "^6.5.0",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.1.6",
-    "vite": "^6.0.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.2.5",
     "vite-tsconfig-paths": "^4.2.1"
   },
   "engines": {
