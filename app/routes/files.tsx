@@ -269,7 +269,7 @@ export default function Files() {
       />
 
       {!location.pathname.startsWith("/files/view/") ? (
-        <main className="flex-1 px-3 py-5 sm:px-6 md:px-8 lg:px-10">
+        <main className="flex-1 px-3 pt-5 pb-16 sm:px-6 md:px-8 lg:px-10">
           <div className="mx-auto max-w-7xl">
             {!isLoadingNextPage && (
               <>
