@@ -36,11 +36,21 @@ export function ThemeProvider({
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      root.classList.add(systemTheme);
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+      const applySystemTheme = (e: MediaQueryListEvent | MediaQueryList) => {
+        const newTheme = e.matches ? "dark" : "light";
+        root.classList.add(newTheme);
+      };
+
+      // Apply initial system theme
+      applySystemTheme(systemTheme);
+
+      // Listen for system theme changes
+      systemTheme.addEventListener("change", applySystemTheme);
+
+      return () => {
+        systemTheme.removeEventListener("change", applySystemTheme);
+      };
     } else {
       root.classList.add(theme);
     }
