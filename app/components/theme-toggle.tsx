@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Icons } from "./icons";
 import { motion } from "framer-motion";
 import { useTheme } from "./theme-provider";
@@ -6,6 +6,7 @@ import { useTheme } from "./theme-provider";
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -20,10 +21,17 @@ export function ThemeToggle() {
     return theme;
   };
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
+    if (isToggling) return;
+
+    setIsToggling(true);
     const currentEffectiveTheme = getEffectiveTheme();
     setTheme(currentEffectiveTheme === "dark" ? "light" : "dark");
-  };
+
+    setTimeout(() => {
+      setIsToggling(false);
+    }, 300);
+  }, [isToggling, setTheme]);
 
   if (!mounted) return null;
 
