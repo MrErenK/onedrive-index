@@ -20,16 +20,31 @@ export function Header({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [stableScrolled, setStableScrolled] = useState(scrolled);
   const { t } = useTranslation();
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Add debounced scroll handling
   useEffect(() => {
-    // Add a delay to ensure the scrolled state doesn't flicker
-    const timer = setTimeout(() => {
-      setStableScrolled(scrolled);
-    }, 50); // Small delay to stabilize transitions
+    let rafId: number;
+    let lastScrollY = window.scrollY;
 
-    return () => clearTimeout(timer);
-  }, [scrolled]);
+    const handleScroll = () => {
+      rafId = requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+
+        // Only update if scroll position changed significantly
+        if (Math.abs(scrollY - lastScrollY) > 5) {
+          setIsScrolled(scrollY > 20);
+          lastScrollY = scrollY;
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -42,12 +57,12 @@ export function Header({
   return (
     <>
       <header
-        className={`sticky top-0 z-50 border-b backdrop-blur-md backdrop-saturate-150 transition-all duration-300 ease-in-out
-          ${
-            stableScrolled
-              ? "border-gray-200/80 bg-white/90 dark:border-gray-800/80 dark:bg-gray-900/90 shadow-sm py-2"
-              : "border-transparent bg-white/50 dark:bg-gray-900/50 py-3"
-          }`}
+        className={`sticky top-0 z-50 transition-all duration-300 ease-out
+              ${
+                isScrolled
+                  ? "border-b border-gray-200/80 bg-white/90 py-2 shadow-sm dark:border-gray-800/80 dark:bg-gray-900/90"
+                  : "border-transparent bg-white/50 py-3 dark:bg-gray-900/50"
+              }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
