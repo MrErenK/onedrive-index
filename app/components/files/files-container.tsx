@@ -6,17 +6,25 @@ import { EmptyState } from "./empty-state";
 import { useTranslation } from "react-i18next";
 import type { DriveItem } from "~/utils/onedrive.server";
 
+interface FilesContainerProps {
+  files: DriveItem[];
+  currentPath: string;
+  viewMode: "list" | "grid";
+  isLoading: boolean;
+  onSort?: (field: string, direction: string) => void;
+  sortField?: string;
+  sortDirection?: string;
+}
+
 export function FilesContainer({
   files,
   currentPath,
   viewMode,
   isLoading,
-}: {
-  files: DriveItem[];
-  currentPath: string;
-  viewMode: "list" | "grid";
-  isLoading: boolean;
-}) {
+  onSort,
+  sortField = "name",
+  sortDirection = "asc",
+}: FilesContainerProps) {
   const { t } = useTranslation();
 
   return (
@@ -55,7 +63,13 @@ export function FilesContainer({
           <EmptyState />
         ) : viewMode === "list" ? (
           <div className="bg-white/80 dark:bg-gray-900/40 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800/60 overflow-hidden">
-            <FileListView files={files} currentPath={currentPath} />
+            <FileListView
+              files={files}
+              currentPath={currentPath}
+              onSort={onSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
+            />
           </div>
         ) : (
           <div className="bg-white/80 dark:bg-gray-900/40 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800/60 p-4">

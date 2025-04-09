@@ -5,7 +5,7 @@ import {
   useLocation,
   Outlet,
 } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { requireAuth } from "~/utils/auth.server";
 import { createOneDriveService } from "~/services/onedrive.service";
 import { Header } from "~/components/header";
@@ -19,6 +19,7 @@ import { ReadmePreview } from "~/components/file-previews/readme-preview";
 import { FilesHeader } from "~/components/files/files-header";
 import { BreadcrumbsNav } from "~/components/files/breadcrumbs-nav";
 import { FilesContainer } from "~/components/files/files-container";
+import { useSortPreference } from "~/hooks/useSortPreference";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const folderName =
@@ -114,6 +115,12 @@ export default function Files() {
     .slice(1)
     .map((crumb: any) => crumb.name)
     .join("/");
+  const { sortField, sortDirection, handleSort } = useSortPreference();
+
+  useEffect(() => {
+    localStorage.setItem("sortField", sortField);
+    localStorage.setItem("sortDirection", sortDirection);
+  }, [sortField, sortDirection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -150,6 +157,38 @@ export default function Files() {
     }
   };
 
+  const sortedFiles = useMemo(() => {
+    const sortedArray = [...files];
+
+    sortedArray.sort((a, b) => {
+      // Always keep folders at the top
+      if (a.folder && !b.folder) return -1;
+      if (!a.folder && b.folder) return 1;
+
+      // Then sort by the selected field
+      let comparison = 0;
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "modified":
+          comparison =
+            new Date(b.lastModifiedDateTime).getTime() -
+            new Date(a.lastModifiedDateTime).getTime();
+          break;
+        case "size":
+          const sizeA = a.size || 0;
+          const sizeB = b.size || 0;
+          comparison = sizeA - sizeB;
+          break;
+      }
+
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+
+    return sortedArray;
+  }, [files, sortField, sortDirection]);
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-gray-50/80 to-white dark:from-gray-900 dark:via-black dark:to-gray-900/80">
       {navigation.state === "loading" && <LoadingBar />}
@@ -174,10 +213,13 @@ export default function Files() {
                 </AnimatePresence>
 
                 <FilesContainer
-                  files={files as DriveItem[]}
+                  files={sortedFiles}
                   currentPath={currentPath}
                   viewMode={viewMode}
                   isLoading={isChangingFolder}
+                  onSort={handleSort}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
                 />
 
                 <AnimatePresence>

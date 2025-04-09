@@ -7,13 +7,24 @@ import { useState } from "react";
 import { copyToClipboard } from "~/utils/copy";
 import { useTranslation } from "react-i18next";
 
+type SortField = "name" | "modified" | "size";
+type SortDirection = "asc" | "desc";
+
+interface FileListViewProps {
+  files: DriveItem[];
+  currentPath: string;
+  onSort?: (field: string, direction: string) => void;
+  sortField?: string;
+  sortDirection?: string;
+}
+
 export function FileListView({
   files,
   currentPath,
-}: {
-  files: DriveItem[];
-  currentPath: string;
-}) {
+  onSort,
+  sortField = "name",
+  sortDirection = "asc",
+}: FileListViewProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const location = useLocation();
   const { t } = useTranslation();
@@ -27,6 +38,30 @@ export function FileListView({
       return folderParam.endsWith("/") ? folderParam : `${folderParam}/`;
     }
     return "";
+  };
+
+  const SortIndicator = ({ field }: { field: SortField }) => {
+    if (field !== sortField) return null;
+
+    return (
+      <Icons.ChevronUp
+        className={`ml-1 h-4 w-4 transition-transform ${
+          sortDirection === "desc" ? "rotate-180" : ""
+        }`}
+      />
+    );
+  };
+
+  const handleSort = (field: SortField) => {
+    if (onSort) {
+      const newDirection =
+        field === sortField
+          ? sortDirection === "asc"
+            ? "desc"
+            : "asc"
+          : "asc";
+      onSort(field, newDirection);
+    }
   };
 
   const handleCopyLink = async (file: DriveItem) => {
@@ -44,25 +79,37 @@ export function FileListView({
     <div className="overflow-hidden rounded-xl border-0 bg-transparent">
       <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
         <table className="min-w-full divide-y divide-gray-200/70 dark:divide-gray-700/50">
-          <thead className="bg-white/60 dark:bg-gray-800/60 sticky top-0 z-10 backdrop-blur-sm">
+          <thead>
             <tr>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300"
+                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
+                onClick={() => handleSort("name")}
               >
-                {t("common.name")}
+                <div className="flex items-center">
+                  {t("common.name")}
+                  <SortIndicator field="name" />
+                </div>
               </th>
               <th
                 scope="col"
-                className="hidden px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 lg:table-cell"
+                className="hidden px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 lg:table-cell"
+                onClick={() => handleSort("modified")}
               >
-                {t("common.modified")}
+                <div className="flex items-center">
+                  {t("common.modified")}
+                  <SortIndicator field="modified" />
+                </div>
               </th>
               <th
                 scope="col"
-                className="hidden px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 md:table-cell"
+                className="hidden px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 md:table-cell"
+                onClick={() => handleSort("size")}
               >
-                {t("common.size")}
+                <div className="flex items-center">
+                  {t("common.size")}
+                  <SortIndicator field="size" />
+                </div>
               </th>
               <th
                 scope="col"
