@@ -152,7 +152,10 @@ export function FileListView({
                         </motion.div>
                       )}
                     </div>
-                    <span className="ml-3 font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                    <span
+                      className="ml-3 font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md"
+                      title={file.name}
+                    >
                       {file.name}
                     </span>
                   </Link>
