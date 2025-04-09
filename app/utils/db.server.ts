@@ -47,11 +47,8 @@ export async function getSession(): Promise<SessionData | null> {
 
   if (!session) return null;
 
-  if (session.expiresAt && new Date() > new Date(session.expiresAt)) {
-    await deleteSession(session.id);
-    return null;
-  }
-
+  // Don't automatically delete expired sessions
+  // Let the refresh mechanism handle it
   return session;
 }
 

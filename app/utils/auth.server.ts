@@ -117,6 +117,16 @@ const tokenUrl = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`
 // Define scopes
 const scopes = ["offline_access", "user.read", "files.read", "files.read.all"];
 
+function isTokenExpiringSoon(
+  expiresAt: string | Date,
+  thresholdMinutes: number = 5
+): boolean {
+  const expirationTime = new Date(expiresAt).getTime();
+  const currentTime = Date.now();
+  const timeUntilExpiry = expirationTime - currentTime;
+  return timeUntilExpiry <= thresholdMinutes * 60 * 1000;
+}
+
 export async function getCurrentSession(request?: Request) {
   try {
     // Get the most recent active session
@@ -124,8 +134,8 @@ export async function getCurrentSession(request?: Request) {
 
     if (!session) return null;
 
-    // Check if token is expired
-    if (session.expiresAt && new Date() > new Date(session.expiresAt)) {
+    // Check if token needs refresh (expires in next 5 minutes)
+    if (session.expiresAt && isTokenExpiringSoon(session.expiresAt)) {
       try {
         const tokens = await refreshAccessToken(session.refreshToken);
 
@@ -136,19 +146,32 @@ export async function getCurrentSession(request?: Request) {
           expiresAt: new Date(tokens.expiresAt),
         });
 
+        // Return the updated session with user data
         return {
           ...updatedSession,
           userData: session.userData,
         };
-      } catch (error) {
-        // Refresh failed, delete the session
-        await deleteSession(session.id);
-        return null;
+      } catch (refreshError: unknown) {
+        console.error("Token refresh failed:", refreshError);
+
+        // Only delete the session if the refresh token is invalid
+        if (
+          refreshError instanceof Error &&
+          refreshError.message.includes("invalid_grant")
+        ) {
+          await deleteSession(session.id);
+          return null;
+        }
+
+        // For other errors, return the existing session
+        // This prevents immediate logout on temporary errors
+        return session;
       }
     }
 
     return session;
   } catch (error) {
+    console.error("Session retrieval error:", error);
     return null;
   }
 }
@@ -258,7 +281,7 @@ export async function logout(request?: Request) {
 }
 
 export async function requireAuth(request: Request) {
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
 
   if (!session) {
     const url = new URL(request.url);

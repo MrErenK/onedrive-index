@@ -5,7 +5,6 @@
   "type": "module",
   "main": "refresh-tokens.js",
   "scripts": {
-    "auto-refresh-tokens": "node refresh-tokens.js",
     "generate-secrets": "node scripts/generate-secrets.js",
     "setup": "npm run generate-secrets && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,9 +12,5 @@
   "private": true,
   "engines": {
     "node": ">=20.0.0"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.7",
-    "node-fetch": "^3.3.2"
   }
 }
