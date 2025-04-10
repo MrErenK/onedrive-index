@@ -12,6 +12,7 @@ NC='\033[0m' # No Color
 
 # Default values
 SERVER_URL="{{SERVER_URL}}"
+API_ENDPOINT="${SERVER_URL}/api/upload"
 DEFAULT_PATH="/"
 PASSWORD=""
 QUIET=false
@@ -86,17 +87,26 @@ upload_file() {
         return 1
     fi
 
+    # Get file name
+    FILE_NAME=$(basename "$file")
+
+    # Get file size
+    FILE_SIZE=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+
     # Remove leading and trailing slashes from destination path
     destination=$(echo "$destination" | sed 's:^/*::' | sed 's:/*$::')
 
     log "info" "Uploading: $filename to /$destination"
 
     local response
-    response=$(curl -s -X POST "${SERVER_URL}/api/upload" \
+    response=$(curl -s -X POST "$API_ENDPOINT" \
         -H "Authorization: Bearer $PASSWORD" \
-        -F "file=@$file" \
-        -F "path=$destination" \
-        -w "\n%{http_code}")
+        -H "Content-Length: $FILE_SIZE" \
+        -H "X-File-Name: $FILE_NAME" \
+        -H "X-Upload-Path: $UPLOAD_PATH" \
+        --data-binary "@$file" \
+        -# \
+        || { log "error" "Upload failed"; exit 1; })
 
     local http_code=$(echo "$response" | tail -n1)
     local body=$(echo "$response" | sed '$d')

@@ -1,6 +1,5 @@
 import { ActionFunctionArgs } from "@remix-run/node";
 import { requireAuth } from "~/utils/auth.server";
-import { createOneDriveService } from "~/services/onedrive.service";
 import { verifyAdminPassword as verifyPassword } from "~/utils/password";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -19,26 +18,85 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // Get the session and OneDrive service
     const { accessToken } = await requireAuth(request);
-    const service = createOneDriveService(accessToken);
 
-    // Parse the multipart form data
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
-    const path = (formData.get("path") as string) || "";
+    // Get content length and file name from headers
+    const contentLength = parseInt(
+      request.headers.get("Content-Length") || "0",
+      10
+    );
+    const fileName = request.headers.get("X-File-Name");
+    const uploadPath = request.headers.get("X-Upload-Path") || "";
 
-    if (!file) {
-      return Response.json({ error: "No file provided" }, { status: 400 });
+    if (!fileName || !contentLength) {
+      return Response.json(
+        { error: "Missing file name or content length" },
+        { status: 400 }
+      );
     }
 
-    // Normalize the path: remove leading/trailing slashes and empty segments
-    const normalizedPath = path.split("/").filter(Boolean).join("/");
+    // Create upload session with OneDrive
+    const normalizedPath = uploadPath.split("/").filter(Boolean).join("/");
+    const uploadEndpoint = normalizedPath
+      ? `https://graph.microsoft.com/v1.0/me/drive/root:/${normalizedPath}/${fileName}:/createUploadSession`
+      : `https://graph.microsoft.com/v1.0/me/drive/root/children/${fileName}/createUploadSession`;
 
-    // Upload the file
-    await service.uploadFile(file, normalizedPath);
+    const sessionResponse = await fetch(uploadEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "@microsoft.graph.conflictBehavior": "rename",
+        fileSize: contentLength,
+        name: fileName,
+      }),
+    });
+
+    if (!sessionResponse.ok) {
+      throw new Error("Failed to create upload session");
+    }
+
+    const { uploadUrl } = await sessionResponse.json();
+    if (!uploadUrl) {
+      throw new Error("No upload URL received");
+    }
+
+    // Stream the file directly to OneDrive in chunks
+    const chunkSize = 10 * 1024 * 1024; // 10MB chunks
+    let uploaded = 0;
+    const reader = request.body?.getReader();
+
+    if (!reader) {
+      throw new Error("Request body is not readable");
+    }
+
+    while (uploaded < contentLength) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = value;
+      const end = Math.min(uploaded + chunk.length, contentLength);
+
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Length": chunk.length.toString(),
+          "Content-Range": `bytes ${uploaded}-${end - 1}/${contentLength}`,
+        },
+        body: chunk,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Failed to upload chunk: ${uploadResponse.statusText}`);
+      }
+
+      uploaded += chunk.length;
+    }
 
     return Response.json({
       success: true,
-      message: `Successfully uploaded ${file.name}`,
+      message: `Successfully uploaded ${fileName}`,
     });
   } catch (error) {
     console.error("Upload error:", error);

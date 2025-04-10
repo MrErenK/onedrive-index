@@ -221,36 +221,11 @@ export function createOneDriveService(accessToken: string): OneDriveOperations {
 
         // For root uploads, use a different endpoint
         const uploadEndpoint = normalizedPath
-          ? `${baseUrl}/root:/${normalizedPath}/${file.name}:/content`
-          : `${baseUrl}/root/children/${file.name}/content`;
-
-        if (file.size < 4 * 1024 * 1024) {
-          // Small file upload (< 4MB)
-          const response = await fetch(uploadEndpoint, {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": file.type || "application/octet-stream",
-            },
-            body: file,
-          });
-
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(
-              error.error ? error.error.message : "Upload failed"
-            );
-          }
-
-          return;
-        }
-
-        // For larger files, use upload session
-        const sessionEndpoint = normalizedPath
           ? `${baseUrl}/root:/${normalizedPath}/${file.name}:/createUploadSession`
           : `${baseUrl}/root/children/${file.name}/createUploadSession`;
 
-        const uploadSessionResponse = await fetch(sessionEndpoint, {
+        // Create upload session
+        const sessionResponse = await fetch(uploadEndpoint, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -264,14 +239,9 @@ export function createOneDriveService(accessToken: string): OneDriveOperations {
           }),
         });
 
-        const sessionData = await uploadSessionResponse.json();
+        const sessionData = await sessionResponse.json();
 
-        if (!uploadSessionResponse.ok) {
-          console.error("Upload session creation failed:", {
-            status: uploadSessionResponse.status,
-            statusText: uploadSessionResponse.statusText,
-            response: sessionData,
-          });
+        if (!sessionResponse.ok) {
           throw new Error(
             sessionData.error
               ? `Failed to create upload session: ${sessionData.error.message}`
@@ -284,37 +254,48 @@ export function createOneDriveService(accessToken: string): OneDriveOperations {
           throw new Error("No upload URL received from session creation");
         }
 
-        // Upload file in chunks
-        const chunkSize = 320 * 1024; // 320 KB chunks
-        const fileSize = file.size;
-        let start = 0;
+        // Use streams for file upload
+        const stream = file.stream();
+        const reader = stream.getReader();
+        const chunkSize = 10 * 1024 * 1024; // 10MB chunks
+        let uploaded = 0;
+        let buffer = new Uint8Array(0);
 
-        while (start < fileSize) {
-          const end = Math.min(start + chunkSize, fileSize);
-          const chunk = file.slice(start, end);
+        while (true) {
+          const { done, value } = await reader.read();
 
-          const uploadChunkResponse = await fetch(uploadUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Length": `${end - start}`,
-              "Content-Range": `bytes ${start}-${end - 1}/${fileSize}`,
-            },
-            body: chunk,
-          });
+          if (done && buffer.length === 0) break;
 
-          if (!uploadChunkResponse.ok) {
-            const chunkError = await uploadChunkResponse.text();
-            console.error("Chunk upload failed:", {
-              status: uploadChunkResponse.status,
-              statusText: uploadChunkResponse.statusText,
-              error: chunkError,
-            });
-            throw new Error(
-              `Failed to upload chunk: ${uploadChunkResponse.statusText}`
-            );
+          // Append new data to buffer
+          if (value) {
+            const newBuffer = new Uint8Array(buffer.length + value.length);
+            newBuffer.set(buffer);
+            newBuffer.set(value, buffer.length);
+            buffer = newBuffer;
           }
 
-          start = end;
+          // Upload complete chunks
+          while (buffer.length >= chunkSize || (done && buffer.length > 0)) {
+            const chunk = buffer.slice(0, chunkSize);
+            const end = Math.min(uploaded + chunk.length, file.size);
+
+            const uploadChunkResponse = await fetch(uploadUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Length": `${chunk.length}`,
+                "Content-Range": `bytes ${uploaded}-${end - 1}/${file.size}`,
+              },
+              body: chunk,
+            });
+
+            if (!uploadChunkResponse.ok) {
+              const error = await uploadChunkResponse.text();
+              throw new Error(`Failed to upload chunk: ${error}`);
+            }
+
+            uploaded += chunk.length;
+            buffer = buffer.slice(chunk.length);
+          }
         }
 
         console.log("File upload completed successfully");
