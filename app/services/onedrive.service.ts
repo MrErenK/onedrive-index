@@ -14,6 +14,8 @@ export interface OneDriveOperations {
   getPathComponents: (
     path: string
   ) => Promise<Array<{ path: string; name: string; id: string }>>;
+  uploadFile: (file: File, path: string) => Promise<void>;
+  uploadFromUrl: (url: string, path: string) => Promise<void>;
 }
 
 export function createOneDriveService(accessToken: string): OneDriveOperations {
@@ -210,6 +212,183 @@ export function createOneDriveService(accessToken: string): OneDriveOperations {
       }
 
       return breadcrumbs;
+    },
+
+    async uploadFile(file: File, path: string): Promise<void> {
+      try {
+        // Normalize the path
+        const normalizedPath = path.split("/").filter(Boolean).join("/");
+
+        // For root uploads, use a different endpoint
+        const uploadEndpoint = normalizedPath
+          ? `${baseUrl}/root:/${normalizedPath}/${file.name}:/content`
+          : `${baseUrl}/root/children/${file.name}/content`;
+
+        if (file.size < 4 * 1024 * 1024) {
+          // Small file upload (< 4MB)
+          const response = await fetch(uploadEndpoint, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": file.type || "application/octet-stream",
+            },
+            body: file,
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(
+              error.error ? error.error.message : "Upload failed"
+            );
+          }
+
+          return;
+        }
+
+        // For larger files, use upload session
+        const sessionEndpoint = normalizedPath
+          ? `${baseUrl}/root:/${normalizedPath}/${file.name}:/createUploadSession`
+          : `${baseUrl}/root/children/${file.name}/createUploadSession`;
+
+        const uploadSessionResponse = await fetch(sessionEndpoint, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            "@microsoft.graph.conflictBehavior": "rename",
+            description: "Uploaded via OneDrive Explorer",
+            fileSize: file.size,
+            name: file.name,
+          }),
+        });
+
+        const sessionData = await uploadSessionResponse.json();
+
+        if (!uploadSessionResponse.ok) {
+          console.error("Upload session creation failed:", {
+            status: uploadSessionResponse.status,
+            statusText: uploadSessionResponse.statusText,
+            response: sessionData,
+          });
+          throw new Error(
+            sessionData.error
+              ? `Failed to create upload session: ${sessionData.error.message}`
+              : "Failed to create upload session"
+          );
+        }
+
+        const { uploadUrl } = sessionData;
+        if (!uploadUrl) {
+          throw new Error("No upload URL received from session creation");
+        }
+
+        // Upload file in chunks
+        const chunkSize = 320 * 1024; // 320 KB chunks
+        const fileSize = file.size;
+        let start = 0;
+
+        while (start < fileSize) {
+          const end = Math.min(start + chunkSize, fileSize);
+          const chunk = file.slice(start, end);
+
+          const uploadChunkResponse = await fetch(uploadUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Length": `${end - start}`,
+              "Content-Range": `bytes ${start}-${end - 1}/${fileSize}`,
+            },
+            body: chunk,
+          });
+
+          if (!uploadChunkResponse.ok) {
+            const chunkError = await uploadChunkResponse.text();
+            console.error("Chunk upload failed:", {
+              status: uploadChunkResponse.status,
+              statusText: uploadChunkResponse.statusText,
+              error: chunkError,
+            });
+            throw new Error(
+              `Failed to upload chunk: ${uploadChunkResponse.statusText}`
+            );
+          }
+
+          start = end;
+        }
+
+        console.log("File upload completed successfully");
+      } catch (error) {
+        console.error("Upload error:", error);
+        throw error;
+      }
+    },
+
+    async uploadFromUrl(url: string, path: string): Promise<void> {
+      // Get file name from URL
+      const fileName = url.split("/").pop() || "downloaded_file";
+
+      // Create upload session
+      const uploadSession = await fetch(
+        `${baseUrl}/root:${path}/${fileName}:/createUploadSession`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!uploadSession.ok) {
+        throw new Error("Failed to create upload session");
+      }
+
+      const { uploadUrl } = await uploadSession.json();
+
+      // Fetch the file from URL
+      const response = await fetch(url);
+      const fileSize = parseInt(response.headers.get("content-length") || "0");
+      const reader = response.body?.getReader();
+
+      if (!reader) {
+        throw new Error("Failed to read file from URL");
+      }
+
+      let uploaded = 0;
+      const chunkSize = 320 * 1024; // 320 KB chunks
+      let buffer = new Uint8Array(0);
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done && buffer.length === 0) break;
+
+        // Append new data to buffer
+        if (value) {
+          const newBuffer = new Uint8Array(buffer.length + value.length);
+          newBuffer.set(buffer);
+          newBuffer.set(value, buffer.length);
+          buffer = newBuffer;
+        }
+
+        // Upload complete chunks
+        while (buffer.length >= chunkSize || (done && buffer.length > 0)) {
+          const chunk = buffer.slice(0, chunkSize);
+          const end = Math.min(uploaded + chunk.length, fileSize);
+
+          await fetch(uploadUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Length": `${chunk.length}`,
+              "Content-Range": `bytes ${uploaded}-${end - 1}/${fileSize}`,
+            },
+            body: chunk,
+          });
+
+          uploaded += chunk.length;
+          buffer = buffer.slice(chunk.length);
+        }
+      }
     },
   };
 }

@@ -2,6 +2,8 @@
 
 This comprehensive guide will help you set up, deploy, and maintain your OneDrive Explorer application on Vercel, including how to create and configure a PostgreSQL database.
 
+Check out the demo at [od.mrerenk.tech](https://od.mrerenk.tech)
+
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
@@ -156,15 +158,6 @@ To enable Microsoft authentication:
    - Go to "Certificates & Secrets"
    - Create a new client secret
    - Copy the secret value (only shown once)
-
-6. **Configure API permissions:**
-   - Go to "API permissions"
-   - Add permissions for Microsoft Graph:
-     - `User.Read` - To get user profile information
-     - `Files.Read` - To read OneDrive files
-     - `Files.Read.All` - To read all files user has access to
-     - `offline_access` - To get refresh tokens
-   - Grant admin consent if required
 
 ## Deployment to Vercel
 

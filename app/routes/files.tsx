@@ -4,8 +4,9 @@ import {
   useNavigation,
   useLocation,
   Outlet,
+  useSubmit,
 } from "@remix-run/react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { requireAuth } from "~/utils/auth.server";
 import { createOneDriveService } from "~/services/onedrive.service";
 import { Header } from "~/components/header";
@@ -13,13 +14,13 @@ import { ErrorAlert } from "~/components/error-alert";
 import { LoadingBar } from "~/components/loading-bar";
 import { Footer } from "~/components/footer";
 import { motion, AnimatePresence } from "framer-motion";
-import type { DriveItem } from "~/utils/onedrive.server";
 import { useOneDrive } from "~/hooks/useOnedrive";
 import { ReadmePreview } from "~/components/file-previews/readme-preview";
 import { FilesHeader } from "~/components/files/files-header";
 import { BreadcrumbsNav } from "~/components/files/breadcrumbs-nav";
 import { FilesContainer } from "~/components/files/files-container";
 import { useSortPreference } from "~/hooks/useSortPreference";
+import { DragDropUpload } from "~/components/files/drag-drop-upload";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const folderName =
@@ -95,11 +96,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Files() {
-  const { files, breadcrumbs, user, error, readmeContent } =
+  const { files, breadcrumbs, user, error, readmeContent, accessToken } =
     useLoaderData<typeof loader>();
   const [showReadme, setShowReadme] = useState(Boolean(readmeContent));
   const navigation = useNavigation();
   const location = useLocation();
+  const submit = useSubmit();
   const [viewMode, setViewMode] = useState<"list" | "grid">(() => {
     // Try to get from localStorage if available
     if (typeof window !== "undefined") {
@@ -139,6 +141,23 @@ export default function Files() {
   useEffect(() => {
     localStorage.setItem("viewMode", viewMode);
   }, [viewMode]);
+
+  // Readme hash navigation
+  useEffect(() => {
+    // Handle hash navigation on page load
+    if (location.hash && readmeContent) {
+      // Delay slightly to ensure the README has fully rendered
+      const timer = setTimeout(() => {
+        const id = location.hash.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, readmeContent]);
 
   const isLoadingNextPage =
     navigation.state === "loading" && navigation.location.pathname !== "/files";
@@ -189,6 +208,59 @@ export default function Files() {
     return sortedArray;
   }, [files, sortField, sortDirection]);
 
+  const refreshFiles = useCallback(() => {
+    // Use submit to reload the page data
+    submit(null, {
+      method: "get",
+      action: location.pathname + location.search,
+    });
+  }, [submit, location]);
+
+  const handleFileUpload = async (file: File, path: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("path", path);
+      formData.append("uploadType", "file");
+
+      const response = await fetch("/files/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      throw error;
+    }
+  };
+
+  const handleUrlUpload = async (url: string, path: string) => {
+    const formData = new FormData();
+    formData.append("url", url);
+    formData.append("path", path);
+    formData.append("uploadType", "url");
+
+    await fetch("/files/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    // Refresh files after URL upload
+    refreshFiles();
+  };
+
+  const fetchFolders = useCallback(
+    async (path: string) => {
+      const service = createOneDriveService(accessToken);
+      return service.getChildrenByPath(path);
+    },
+    [accessToken]
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-gray-50/80 to-white dark:from-gray-900 dark:via-black dark:to-gray-900/80">
       {navigation.state === "loading" && <LoadingBar />}
@@ -211,6 +283,14 @@ export default function Files() {
                 <AnimatePresence mode="wait">
                   {error && <ErrorAlert message={error} />}
                 </AnimatePresence>
+
+                <DragDropUpload
+                  currentPath={currentPath}
+                  onUpload={handleFileUpload}
+                  onUrlUpload={handleUrlUpload}
+                  onFetchFolders={fetchFolders}
+                  onUploadComplete={refreshFiles}
+                />
 
                 <FilesContainer
                   files={sortedFiles}

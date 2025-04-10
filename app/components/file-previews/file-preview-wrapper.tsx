@@ -144,7 +144,9 @@ export function FilePreviewWrapper({
     );
   }, [mimeType, fileName, downloadUrl, fileSize, thumbnailUrl]);
 
-  return PreviewComponent;
+  return (
+    <div className="h-full w-full overflow-hidden">{PreviewComponent}</div>
+  );
 }
 
 function NonViewableFileMessage({
@@ -161,40 +163,43 @@ function NonViewableFileMessage({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="mt-6 rounded-xl border border-gray-200 bg-white p-12 text-center shadow-lg dark:border-gray-700 dark:bg-gray-800"
+      className="flex h-full w-full items-center justify-center p-6"
     >
-      <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-        <Icons.GenericFile className="h-14 w-14 text-gray-500 dark:text-gray-400" />
-      </div>
-      <h3 className="mt-6 text-2xl font-semibold text-gray-800 dark:text-white">
-        {t("fileView.notAvailable")}
-      </h3>
-      <p className="mt-3 text-gray-600 dark:text-gray-300">
-        <span className="font-medium">
-          {fileName} {t("fileView.cannotPreview")}
-        </span>
-      </p>
+      <div className="max-w-md rounded-xl border border-gray-200 bg-white p-8 text-center shadow-xl dark:border-gray-700 dark:bg-gray-800">
+        <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-gray-100 shadow-inner dark:bg-gray-700">
+          <Icons.GenericFile className="h-16 w-16 text-gray-500 dark:text-gray-400" />
+        </div>
+        <h3 className="mt-6 text-2xl font-semibold text-gray-800 dark:text-white">
+          {t("fileView.notAvailable")}
+        </h3>
+        <div className="mt-3 text-gray-600 dark:text-gray-300">
+          <p className="font-medium truncate max-w-full px-4" title={fileName}>
+            {fileName}
+          </p>
+          <p className="mt-1">{t("fileView.cannotPreview")}</p>
+        </div>
 
-      <motion.div
-        className="mt-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
         <motion.div
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.97 }}
+          className="mt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
         >
-          <a
-            href={downloadUrl}
-            className="group inline-flex items-center rounded-lg bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-md transition-all hover:bg-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-500"
-            download
+          <motion.div
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.97 }}
           >
-            <Icons.Download className="mr-3 h-5 w-5 transition-transform group-hover:translate-y-0.5" />
-            {t("fileView.downloadFileButton")}
-          </a>
+            <a
+              href={downloadUrl}
+              className="group inline-flex items-center rounded-lg bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-3.5 text-base font-medium text-white shadow-md transition-all hover:from-gray-900 hover:to-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 dark:from-gray-700 dark:to-gray-600 dark:hover:from-gray-600 dark:hover:to-gray-500 dark:focus:ring-gray-500"
+              download
+            >
+              <Icons.Download className="mr-3 h-5 w-5 transition-transform group-hover:translate-y-0.5" />
+              {t("fileView.downloadFileButton")}
+            </a>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

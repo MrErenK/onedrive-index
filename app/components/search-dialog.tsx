@@ -26,7 +26,9 @@ export function SearchDialog({ isOpen, onClose, onSearch }: SearchDialogProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Close on Escape
       if (e.key === "Escape") {
-        onClose();
+        if (isOpen) {
+          onClose();
+        }
         return;
       }
 

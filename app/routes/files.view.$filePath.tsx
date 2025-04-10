@@ -85,10 +85,9 @@ export default function FileViewer() {
         downloadUrl={downloadUrl}
       />
 
-      {/* Updated main content layout */}
       <main className="flex-1 container mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main Preview - Now spans more columns */}
+          {/* Main Preview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -96,9 +95,7 @@ export default function FileViewer() {
             className="lg:col-span-9 order-2 lg:order-1"
           >
             <div className="h-full rounded-xl bg-white/40 backdrop-blur-sm p-1 shadow-lg dark:bg-gray-900/40 border border-gray-200/50 dark:border-gray-700/50">
-              <div className="h-[calc(100vh-13rem)]">
-                {" "}
-                {/* Adjusted height */}
+              <div className="h-[calc(100vh-13rem)] overflow-hidden">
                 <FilePreviewWrapper
                   file={fileDetails}
                   downloadUrl={downloadUrl}
@@ -107,7 +104,7 @@ export default function FileViewer() {
             </div>
           </motion.div>
 
-          {/* Sidebar - Now takes fewer columns */}
+          {/* Sidebar */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -115,8 +112,6 @@ export default function FileViewer() {
             className="lg:col-span-3 order-1 lg:order-2"
           >
             <div className="sticky top-24">
-              {" "}
-              {/* Sticky sidebar */}
               <FileInfoPanel fileDetails={fileDetails} />
             </div>
           </motion.div>

@@ -10,7 +10,6 @@
     "back": "Back",
     "modified": "Modified",
     "cancel": "Cancel",
-    "searchFiles": "Search files...",
     "emptyFolder": "This folder is empty",
     "emptyFolderDescription": "No files or folders found in this location",
     "startTyping": "Start typing to search files...",
@@ -23,31 +22,24 @@
     "actions": "Actions",
     "item": "item",
     "items": "items",
-    "noFiles": "No files found",
     "folder": "Folder",
     "file": "File",
-    "logout": "Logout",
-    "login": "Login",
-    "loginDescription": "Log in to access your OneDrive files",
-    "welcome": "Welcome",
-    "continue": "Continue",
     "home": "Home",
     "downloadFile": "Download file",
     "pageNotFound": "Page Not Found",
     "pageNotFoundDescription": "Sorry, we couldn't find the page you're looking for. Please check the URL or try again later.",
     "backToHome": "Go back to Home",
     "listView": "List View",
-    "gridView": "Grid View"
+    "gridView": "Grid View",
+    "downloadScript": "Download Script",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "refreshing": "Refreshing..."
   },
   "header": {
-    "searchPlaceholder": "Search files and folders...",
-    "switchTheme": "Switch theme"
+    "searchPlaceholder": "Search files and folders..."
   },
   "fileView": {
-    "preview": "Preview",
-    "downloadFile": "Download file",
-    "fileDetails": "File Details",
-    "openParentFolder": "Open parent folder",
     "notAvailable": "Preview not available",
     "cannotPreview": "cannot be previewed in the browser.",
     "downloadFileButton": "Download File",
@@ -59,26 +51,16 @@
   },
   "auth": {
     "password": "Password",
-    "authenticating": "Authenticating...",
-    "completing": "Completing your login",
     "loggingIn": "Logging in...",
     "loggingOut": "Logging out...",
     "loggingInMessage": "Please wait while we authenticate your account",
-    "loggingOutMessage": "Please wait while we log you out",
     "settingUp": "Setting up...",
     "setupWelcome": "Welcome! Let's set up your application",
     "createPassword": "Create Password",
     "confirmPassword": "Confirm Password",
     "passwordNotice": "This password will be used to secure access to your OneDrive files",
-    "setupComplete": "Setup completed successfully! Please login with your new password.",
-    "setupFailed": "Failed to save configuration. Please check permissions.",
     "secureLogin": "Secure login to access your OneDrive files",
-    "invalidPassword": "Invalid password",
-    "passwordRequired": "Password is required",
-    "minPasswordLength": "Password must be at least 8 characters long",
-    "passwordsNotMatch": "Passwords do not match",
     "enterPassword": "Enter your password",
-    "confirmLogout": "Confirm Logout",
     "loginMessage": "Please enter your password to login",
     "logoutMessage": "Please enter your password to log out and end your session.",
     "verifying": "Verifying...",
@@ -94,7 +76,23 @@
     "copyLink": "Copy Link"
   },
   "footer": {
-    "copyright": "OneDrive Explorer.",
-    "allRightsReserved": "All rights reserved."
+    "copyright": "OneDrive Explorer."
+  },
+  "upload": {
+    "dragFiles": "Drag and drop files here",
+    "dropFiles": "Drop files to upload",
+    "dragDescription": "or use the buttons below",
+    "selectFiles": "Select Files",
+    "uploadFromUrl": "Upload from URL",
+    "uploadUrl": "Upload",
+    "urlPlaceholder": "Enter URL to upload from",
+    "destination": "Upload Destination",
+    "pathPlaceholder": "Enter destination path (leave empty for current folder)",
+    "verifyPassword": "Verify Password",
+    "verifyPasswordDescription": "Please enter your password to verify your identity.",
+    "uploadQueue": "Upload Queue",
+    "queued": "Queued",
+    "upload": "Upload",
+    "uploadAll": "Upload All"
   }
 }

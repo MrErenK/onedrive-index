@@ -40,7 +40,6 @@ const clientId = process.env.MICROSOFT_APP_ID;
 const clientSecret = process.env.MICROSOFT_APP_SECRET;
 const tenant = process.env.MICROSOFT_APP_TENANT || "common";
 const redirectUri = process.env.REDIRECT_URI;
-const appPassword = process.env.APP_PASSWORD;
 
 if (!clientId || !clientSecret || !redirectUri) {
   throw new Error(
@@ -115,7 +114,14 @@ const authUrl = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authori
 const tokenUrl = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`;
 
 // Define scopes
-const scopes = ["offline_access", "user.read", "files.read", "files.read.all"];
+const scopes = [
+  "offline_access",
+  "user.read",
+  "files.read",
+  "files.read.all",
+  "files.readwrite",
+  "files.readwrite.all",
+];
 
 function isTokenExpiringSoon(
   expiresAt: string | Date,
@@ -188,6 +194,7 @@ export function getAuthorizationUrl(state: string) {
     scope: scopes.join(" "),
     response_mode: "query",
     state: state,
+    prompt: "consent",
   };
 
   const searchParams = new URLSearchParams(params);

@@ -57,10 +57,10 @@ export function Header({
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ease-out
+        className={`sticky top-0 z-50 transition-all duration-300 ease-out backdrop-blur-sm
               ${
                 isScrolled
-                  ? "border-b border-gray-200/80 bg-white/90 py-2 shadow-sm dark:border-gray-800/80 dark:bg-gray-900/90"
+                  ? "border-b border-gray-200/80 bg-white/85 py-2 shadow-md dark:border-gray-800/80 dark:bg-gray-900/85"
                   : "border-transparent bg-white/50 py-3 dark:bg-gray-900/50"
               }`}
       >
@@ -78,7 +78,7 @@ export function Header({
                       ${stableScrolled ? "h-6 w-6" : "h-7 w-7"}`}
                   />
                   <motion.div
-                    className="absolute -inset-2 rounded-full bg-blue-100 dark:bg-blue-900/30 z-[-1] opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -inset-2 rounded-full bg-blue-100/80 dark:bg-blue-900/40 z-[-1] opacity-0 group-hover:opacity-100 transition-opacity"
                     animate={{ scale: [0.95, 1.05, 0.95] }}
                     transition={{
                       repeat: Infinity,
@@ -100,7 +100,7 @@ export function Header({
               {onSearch && (
                 <motion.button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-2 text-sm text-gray-700 transition-colors dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                  className="flex items-center rounded-full bg-gray-100/90 hover:bg-gray-200/90 dark:bg-gray-800/90 dark:hover:bg-gray-700/90 px-3.5 py-2 text-sm text-gray-700 transition-colors dark:text-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -116,8 +116,8 @@ export function Header({
 
               <div className="flex items-center gap-3">
                 <div
-                  className={`relative hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200/70 dark:border-gray-700/70 transition-all duration-300
-                    ${stableScrolled ? "" : "shadow-sm"}`}
+                  className={`relative hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-gray-50/90 dark:bg-gray-800/80 border border-gray-200/70 dark:border-gray-700/80 transition-all duration-300 hover:shadow-md
+                    ${stableScrolled ? "shadow-sm" : "shadow"}`}
                 >
                   <div className="relative">
                     <img
@@ -128,7 +128,7 @@ export function Header({
                       className={`rounded-full ring-2 ring-white dark:ring-gray-800 transition-all duration-300
                         ${stableScrolled ? "h-7 w-7" : "h-8 w-8"}`}
                     />
-                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm" />
                   </div>
                   <span
                     className={`font-medium text-gray-800 dark:text-gray-200 transition-all duration-300
@@ -139,10 +139,10 @@ export function Header({
                 </div>
 
                 <div className="hidden md:flex items-center">
-                  <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1" />
+                  <div className="h-6 w-px bg-gray-300/90 dark:bg-gray-700/90 mx-1.5" />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <ThemeToggle />
                   <LanguageSelector />
                 </div>
