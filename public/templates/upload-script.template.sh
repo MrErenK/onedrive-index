@@ -55,17 +55,22 @@ log() {
 # Function to verify password
 verify_password() {
     local response
+    local http_code
     response=$(curl -s -X POST "${SERVER_URL}/api/verify-password" \
-        -H "Content-Type: application/json" \
-        -d "{\"password\": \"$PASSWORD\"}")
+        -H "Authorization: Bearer $PASSWORD" \
+        -w "\n%{http_code}")
+
+    http_code=$(echo "$response" | tail -n1)
+    body=$(echo "$response" | sed '$d')
 
     if [ $? -ne 0 ]; then
         log "error" "Failed to verify password"
         exit 1
     fi
 
-    if [[ $response == *"Invalid password"* ]]; then
-        log "error" "Invalid password"
+    if [ "$http_code" != "200" ]; then
+        log "error" "Invalid password (HTTP $http_code)"
+        log "error" "Server response: $body"
         exit 1
     fi
 }

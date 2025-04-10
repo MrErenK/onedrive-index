@@ -1,6 +1,7 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-import { requireAuth, verifyPassword } from "~/utils/auth.server";
+import { requireAuth } from "~/utils/auth.server";
 import { createOneDriveService } from "~/services/onedrive.service";
+import { verifyAdminPassword as verifyPassword } from "~/utils/password";
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -10,8 +11,8 @@ export async function action({ request }: ActionFunctionArgs) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const password = authHeader.slice(7); // Remove "Bearer " prefix
-    const isValidPassword = await verifyPassword(password);
+    const password = authHeader.slice(7);
+    const isValidPassword = verifyPassword(password);
     if (!isValidPassword) {
       return Response.json({ error: "Invalid password" }, { status: 401 });
     }

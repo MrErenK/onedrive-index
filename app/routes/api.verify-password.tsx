@@ -1,13 +1,5 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-
-function verifyPassword(password: string): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    console.error("ADMIN_PASSWORD environment variable not set");
-    return false;
-  }
-  return password === adminPassword;
-}
+import { verifyAdminPassword as verifyPassword } from "~/utils/password";
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
@@ -15,8 +7,14 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   try {
-    const { password } = await request.json();
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    }
 
+    const password = authHeader.slice(7); // Remove "Bearer " prefix
     if (!password) {
       return new Response(JSON.stringify({ error: "Password is required" }), {
         status: 400,
@@ -24,7 +22,6 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const isValid = verifyPassword(password);
-
     if (!isValid) {
       return new Response("Invalid password", { status: 401 });
     }
