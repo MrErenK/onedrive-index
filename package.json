@@ -14,10 +14,10 @@
     "format": "npx prettier --write \"**/*.{tsx,ts,jsx,js,json}\""
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0",
-    "@remix-run/node": "^2.16.4",
-    "@remix-run/react": "^2.16.4",
-    "@remix-run/serve": "^2.16.4",
+    "@prisma/client": "^6.6.0",
+    "@remix-run/node": "^2.16.5",
+    "@remix-run/react": "^2.16.5",
+    "@remix-run/serve": "^2.16.5",
     "framer-motion": "^12.6.3",
     "highlight.js": "^11.11.1",
     "i18next": "^23.16.8",
@@ -33,7 +33,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.16.4",
+    "@remix-run/dev": "^2.16.5",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/react": "^18.2.20",
@@ -48,10 +48,10 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.38",
-    "prisma": "^6.5.0",
+    "prisma": "^6.6.0",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.8.3",
-    "vite": "^6.2.5",
+    "vite": "^6.2.6",
     "vite-tsconfig-paths": "^4.2.1"
   },
   "engines": {
