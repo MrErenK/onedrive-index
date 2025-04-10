@@ -66,7 +66,7 @@ export function FileListView({
 
   const handleCopyLink = async (file: DriveItem) => {
     // Build the file's path
-    const filePath = encodeURIComponent(`${getPathFromUrl()}${file.name}`);
+    const filePath = encodeURIComponent(`${getPathFromUrl()}/${file.name}`);
     const url = `${window.location.origin}/files/download/${filePath}`;
     const success = await copyToClipboard(url);
     if (success) {

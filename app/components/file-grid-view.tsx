@@ -101,7 +101,9 @@ export function FileGridView({
             {!file.folder && (
               <div className="mt-auto pt-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <Link
-                  to={`/files/download/${file.id}`}
+                  to={`/files/download/${encodeURIComponent(
+                    `${getPathFromUrl()}/${file.name}`
+                  )}`}
                   className="w-full inline-flex items-center justify-center rounded-md bg-blue-100/80 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200/80 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-800/60"
                   reloadDocument
                   onClick={(e) => e.stopPropagation()}
