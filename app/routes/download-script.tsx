@@ -6,7 +6,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   await requireAuth(request);
 
   const url = new URL(request.url);
-  const serverUrl = `${url.protocol}//${url.host}`;
+  const isLocalhost =
+    url.hostname === "localhost" || url.hostname === "127.0.0.1";
+
+  // Use HTTP for localhost, HTTPS for all other domains
+  const protocol = isLocalhost ? "http:" : "https:";
+  const serverUrl = `${protocol}//${url.host}`;
 
   const script = generateUploadScript(serverUrl);
 
